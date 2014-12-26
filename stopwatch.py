@@ -1,127 +1,145 @@
-"""Stopwatch
+"""Workoutwatch
 
+A stopwatch that doubles as a workout guide. 
+	
 """
 
 from tkinter import *
 from workout_repository import *
-
-class Time(object):
-	def __init__(self):
-		self.min = 0
-		self.sec = 0
-
-	def increment(self):		
-		self.sec += 1
-		if self.sec == 60:
-			self.min += 1
-			self.sec = 0
-		if self.min == 60:
-			self.min == 0
-		
-	def __str__(self):
-		if self.min < 10 and self.sec < 10:
-			return "0{0}:0{1}".format(self.min,self.sec)
-		if self.sec < 10:
-			return "{0}:0{1}".format(self.min,self.sec)
-		if self.min < 10:
-			return "0{0}:{1}".format(self.min,self.sec)
-
-	def __repr__(self):
-		if self.min < 10 and self.sec < 10:
-			return "0{0}:0{1}".format(self.min,self.sec)
-		if self.sec < 10:
-			return "{0}:0{1}".format(self.min,self.sec)
-		if self.min < 10:
-			return "0{0}:{1}".format(self.min,self.sec)
+from timer import Timer
 
 class Application(Frame):
 	
-	stopwatch = Time()
+	stopwatch = Timer()
 	start = False
 	
 	def createWidgets(self):
 		self.start = Button(self, text="START", fg="green", command=self.start, width=10)
-		self.start.grid(row=2,column=1)
+		self.start.grid(row=2,column=2)
 
 		self.reset = Button(self, text="RESET", fg="blue",command=self.reset, width=10)
-		self.reset.grid(row=3,column=1)
+		self.reset.grid(row=3,column=2)
 
 		self.stop = Button(self, text = "STOP", fg = "red", command = self.stop, width=10)
-		self.stop.grid(row=4,column=1)
+		self.stop.grid(row=4,column=2)
 
 		self.quit = Button(self, text="QUIT", command=self.quit,width=10)
-		self.quit.grid(row=5,column=1)
+		self.quit.grid(row=5,column=2)
 
 		self.time = Label(self, fg = "black", font=("Helectevia",150))
 		self.time["text"] = Application.stopwatch
-		self.time.grid(row=1,column=1)
+		self.time.grid(row=1,column=2)
 
 		self.exercise = Label(self, font= ("Helectevia",50), width=25)
-		self.exercise["text"] = "Exercise Will Appear Here"
-		self.exercise.grid(row=0,column=1)
+		self.exercise["text"] = "Select Workout"
+		self.exercise.grid(row=0,column=2)
 
-		self.monday = Button(self, text="MONDAY",command=self.create_workout("Monday"),width=10)
-		self.monday.grid(row=2,column=0)
+		self.ab_circuit_label = Label(self, text="Abs",width=10,font="Helectevia")
+		self.ab_circuit_label.grid(row=2,column=0)
 
-		self.tuesday = Button(self, text="TUESDAY",command=self.create_workout("Tuesday"),width=10)
-		self.tuesday.grid(row=3,column=0)
+		self.ab_circuit_1 = Button(self, text="Ab Circuit 1",command=self.create_ab_workout("Ab Circuit 1"),width=10)
+		self.ab_circuit_1.grid(row=3,column=0)
 
-		self.wednesday = Button(self, text="WEDNESDAY",command=self.create_workout("Wednesday"),width=10)
-		self.wednesday.grid(row=4,column=0)
+		self.ab_circuit_2 = Button(self, text="Ab Circuit 2",command=self.create_ab_workout("Ab Circuit 2"),width=10)
+		self.ab_circuit_2.grid(row=4,column=0)
 
-		self.thursday = Button(self, text="THURSDAY",command=self.create_workout("Thursday"),width=10)
-		self.thursday.grid(row=5,column=0)
+		self.ab_circuit_3 = Button(self, text="Ab Circuit 3",command=self.create_ab_workout("Ab Circuit 3"),width=10)
+		self.ab_circuit_3.grid(row=5,column=0)
 
-		self.friday = Button(self, text="FRIDAY",command=self.create_workout("Friday"),width=10)
-		self.friday.grid(row=6,column=0)
+		self.ab_circuit_4 = Button(self, text="Ab Circuit 4",command=self.create_ab_workout("Ab Circuit 4"),width=10)
+		self.ab_circuit_4.grid(row=6,column=0)
 
-		self.saturday = Button(self, text="SATURDAY",command=self.create_workout("Saturday"),width=10)
-		self.saturday.grid(row=7,column=0)
+		self.ab_circuit_5 = Button(self, text="Ab Circuit 5",command=self.create_ab_workout("Ab Circuit 5"),width=10)
+		self.ab_circuit_5.grid(row=7,column=0)
 
-		self.sunday = Button(self, text="SUNDAY",command=self.create_workout("Sunday"),width=10)
-		self.sunday.grid(row=8,column=0)
+		self.ab_circuit_6 = Button(self, text="Ab Circuit 6",command=self.create_ab_workout("Ab Circuit 6"),width=10)
+		self.ab_circuit_6.grid(row=8,column=0)
+
+		self.jumprope_circuit_label = Label(self,text="Jumprope",width=10,font="Helectevia")
+		self.jumprope_circuit_label.grid(row=2,column=1)
+
+		self.jumprope_circuit_1 = Button(self, text="Jumprope 1",command=self.create_jumprope_workout("Jumprope Circuit 1"),width=10)
+		self.jumprope_circuit_1.grid(row=3,column=1)
 		
 
-	def __init__(self, master=None):
+	def __init__(self, master=None,circuit="Ab Circuit 1"):
 		Frame.__init__(self,master)
 		self.pack()
 		self.createWidgets()
-		self.workout = iter(Ab_workout("Monday"))
+		self.workout = Abdominals(circuit)
+		self.iter_workout = iter(self.workout)
+		self.circuit = circuit
 
 	def start(self):
+		"""
+		Starts the stopwatch by changing the start value to true and beginning update.
+		"""
 		Application.start = True
 		stopwatch.update_time()
+		self.start.config(state="disabled")
 
 	def reset(self):
+		"""
+		Resets stopwatch and also returns to the beginning of the circuit.
+		"""
 		Application.start = False
 		Application.stopwatch.min, Application.stopwatch.sec = 0, 0
 		self.time.config(text="00:00")
-		self.exercise["text"] = "Exercise Will Appear Here"
+		self.exercise["text"] = "Select Workout"
+		self.start.config(state="active")
+		if type(self.workout) is Abdominals:
+			self.workout = Abdominals(self.circuit)
+		if type(self.workout) is Jumprope:
+			self.workout = Jumprope(self.circuit)
+		self.iter_workout = iter(self.workout)
 
 	def stop(self):
+		"""
+		Stops the time by changing start value to false. 
+		"""
 		Application.start = False
+		self.start.config(state="active")
 
 	def update_time(self):
 		"""
-		Updates stopwatch every second, accounting for time program run.
+		Updates stopwatch every second, also checking multiples of set cycle to swtich workout.
+		Uses root.after to pause the operation of update_time. 
 		"""
 		if Application.start:
-			if Application.stopwatch.sec == 0 or Application.stopwatch.sec == 20 or Application.stopwatch.sec == 40:
-				self.update_exercise(self.workout)
+			if Application.stopwatch.sec % self.workout.interval == 0:
+				self.update_exercise(self.iter_workout)
 			Application.stopwatch.increment()
 			self.time.config(text = Application.stopwatch)
 			root.after(1000, self.update_time)
 	
 	def update_exercise(self,exercise_lst):
-		self.exercise.config(text = next(self.workout))
+		"""
+		Changes display to the following exercise.
+		"""
+		self.exercise.config(text = next(self.iter_workout))
 
-	def create_workout(self,day):
+	def create_ab_workout(self,circuit):
+		"""
+		Creates ab workout.
+		"""
 		def helper():
-			self.workout = iter(Ab_workout(day))
+			self.circuit = circuit
+			self.workout = Abdominals(self.circuit)
+			self.iter_workout = iter(self.workout)
 			Application.reset(self)
 		return helper
 
-x = Time()
+	def create_jumprope_workout(self,circuit):
+		"""
+		Creates jumprope workout
+		"""
+		def helper():
+			self.circuit = circuit
+			self.workout = Jumprope(self.circuit)
+			self.iter_workout = iter(self.workout)
+			Application.reset(self)
+		return helper
+
 root = Tk()
 
 # create the application
@@ -133,10 +151,7 @@ stopwatch.master.title("Workoutwatch")
 stopwatch.mainloop()
 root.destroy()
 
-# code for updating stopwatch every second
-#while start:
-#	update()
-#	time.sleep(1)
+
 
 
 
